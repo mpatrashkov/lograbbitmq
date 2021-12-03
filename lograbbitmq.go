@@ -32,6 +32,8 @@ func (e LogRabbitMQ) ServeDNS(ctx context.Context, w dns.ResponseWriter, r *dns.
 	// Debug log that we've have seen the query. This will only be shown when the debug plugin is loaded.
 	log.Debug("Received response")
 
+	RabbitMqChannelInstance.Send("example")
+
 	// Wrap.
 	pw := NewResponsePrinter(w)
 
