@@ -31,8 +31,9 @@ func (e LogRabbitMQ) ServeDNS(ctx context.Context, w dns.ResponseWriter, r *dns.
 
 	// Debug log that we've have seen the query. This will only be shown when the debug plugin is loaded.
 	log.Debug(r.Question[0].Name)
+	log.Debug("test")
 
-	RabbitMqChannelInstance.Send("example")
+	// RabbitMqChannelInstance.Send("example")
 
 	// Wrap.
 	pw := NewResponsePrinter(w)
@@ -59,6 +60,6 @@ func NewResponsePrinter(w dns.ResponseWriter) *ResponsePrinter {
 
 // WriteMsg calls the underlying ResponseWriter's WriteMsg method and prints "example" to standard output.
 func (r *ResponsePrinter) WriteMsg(res *dns.Msg) error {
-	log.Info("example")
+	log.Info("example123")
 	return r.ResponseWriter.WriteMsg(res)
 }

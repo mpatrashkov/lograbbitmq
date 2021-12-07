@@ -29,7 +29,7 @@ func (rabbitMqChannel *RabbitMqChannel) Send(msg string) {
 	failOnError(err, "Failed to publish a message")
 }
 
-var RabbitMqChannelInstance = RabbitMqChannel{}
+// var RabbitMqChannelInstance = RabbitMqChannel{}
 
 // init registers this plugin.
 func init() { plugin.Register("lograbbitmq", setup) }
@@ -63,24 +63,24 @@ func failOnError(err error, msg string) {
 }
 
 func setupRabbitMqConnection() {
-	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
-	failOnError(err, "Failed to connect to RabbitMQ")
-	defer conn.Close()
+	// conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
+	// failOnError(err, "Failed to connect to RabbitMQ")
+	// defer conn.Close()
 
-	ch, err := conn.Channel()
-	failOnError(err, "Failed to open a channel")
-	defer ch.Close()
+	// ch, err := conn.Channel()
+	// failOnError(err, "Failed to open a channel")
+	// defer ch.Close()
 
-	q, err := ch.QueueDeclare(
-		"hello", // name
-		false,   // durable
-		false,   // delete when unused
-		false,   // exclusive
-		false,   // no-wait
-		nil,     // arguments
-	)
-	failOnError(err, "Failed to declare a queue")
+	// q, err := ch.QueueDeclare(
+	// 	"hello", // name
+	// 	false,   // durable
+	// 	false,   // delete when unused
+	// 	false,   // exclusive
+	// 	false,   // no-wait
+	// 	nil,     // arguments
+	// )
+	// failOnError(err, "Failed to declare a queue")
 
-	RabbitMqChannelInstance.Channel = ch
-	RabbitMqChannelInstance.Queue = q
+	// RabbitMqChannelInstance.Channel = ch
+	// RabbitMqChannelInstance.Queue = q
 }
