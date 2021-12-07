@@ -30,7 +30,7 @@ func (e LogRabbitMQ) ServeDNS(ctx context.Context, w dns.ResponseWriter, r *dns.
 	// answer comes back, it will print "example".
 
 	// Debug log that we've have seen the query. This will only be shown when the debug plugin is loaded.
-	log.Debug("Received response")
+	log.Debug(r.Question[0].Name)
 
 	RabbitMqChannelInstance.Send("example")
 
