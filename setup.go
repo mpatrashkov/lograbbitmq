@@ -5,8 +5,6 @@ import (
 	"github.com/coredns/coredns/core/dnsserver"
 	"github.com/coredns/coredns/plugin"
 
-	"log"
-
 	"github.com/streadway/amqp"
 
 	"fmt"
@@ -60,9 +58,9 @@ func setup(c *caddy.Controller) error {
 }
 
 func failOnError(err error, msg string) {
-	if err != nil {
-		log.Fatalf("%s: %s", msg, err)
-	}
+	// if err != nil {
+	// 	log.Fatalf("%s: %s", msg, err)
+	// }
 }
 
 func setupRabbitMqConnection() {
