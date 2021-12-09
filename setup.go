@@ -8,6 +8,8 @@ import (
 	"log"
 
 	"github.com/streadway/amqp"
+
+	"fmt"
 )
 
 type RabbitMqChannel struct {
@@ -37,6 +39,7 @@ func init() { plugin.Register("lograbbitmq", setup) }
 // setup is the function that gets called when the config parser see the token "example". Setup is responsible
 // for parsing any extra options the example plugin may have. The first token this function sees is "example".
 func setup(c *caddy.Controller) error {
+	fmt.Println("Lograbbitmq started")
 	c.Next() // Ignore "example" and give us the next token.
 	if c.NextArg() {
 		// If there was another token, return an error, because we don't have any configuration.
