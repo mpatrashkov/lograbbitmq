@@ -11,7 +11,7 @@ import (
 )
 
 type RabbitMqChannel struct {
-	Channel amqp.Channel
+	Channel *amqp.Channel
 	Queue   amqp.Queue
 }
 
