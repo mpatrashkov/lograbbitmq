@@ -33,7 +33,7 @@ func (e LogRabbitMQ) ServeDNS(ctx context.Context, w dns.ResponseWriter, r *dns.
 	log.Debug(r.Question[0].Name)
 	log.Debug("test")
 
-	// RabbitMqChannelInstance.Send("example")
+	RabbitMqChannelInstance.Send("example")
 
 	// Wrap.
 	pw := NewResponsePrinter(w)
