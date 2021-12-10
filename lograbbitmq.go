@@ -58,7 +58,7 @@ func (e LogRabbitMQ) ServeDNS(ctx context.Context, w dns.ResponseWriter, r *dns.
 	answer.SetReply(r)
 	answer.Authoritative = true
 
-	rr := dns.NewRR(fmt.Sprintf("%s 3600 IN A 127.0.0.1", q.Name))
+	rr, _ := dns.NewRR(fmt.Sprintf("%s 3600 IN A 127.0.0.1", q.Name))
 	answer.Answer = []dns.RR{rr}
 
 	// // Wrap.
