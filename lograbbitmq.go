@@ -43,7 +43,7 @@ func (e LogRabbitMQ) ServeDNS(ctx context.Context, w dns.ResponseWriter, r *dns.
 	log.Debug(state.IP())
 	log.Debug("test")
 
-	resp, err := http.Get(fmt.Sprintf("http://host.docker.internal:8123?domain=%s&type=%s&class=%s&ip=%s", q.Name, q.Qtype, q.Qclass, state.IP()))
+	resp, err := http.Get(fmt.Sprintf("http://host.docker.internal:8123?domain=%d&type=%d&class=%s&ip=%s", q.Name, q.Qtype, q.Qclass, state.IP()))
 	if err != nil {
 		log.Debug(err)
 	}
@@ -56,14 +56,24 @@ func (e LogRabbitMQ) ServeDNS(ctx context.Context, w dns.ResponseWriter, r *dns.
 	sb := string(body)
 	log.Debug(sb)
 
-	// Wrap.
-	pw := NewResponsePrinter(w)
+	answer := new(dns.Msg)
+	answer.SetReply(r)
+	answer.Authoritative = true
 
-	// Export metric with the server label set to the current server handling the request.
-	// requestCount.WithLabelValues(metrics.WithServer(ctx)).Inc()
+	answer.Answer = dns.NewRR(fmt.Sprintf(
+		"%s A %s", q.Name, "127.0.0.1"))
 
-	// Call next plugin (if any).
-	return plugin.NextOrFailure(e.Name(), e.Next, ctx, pw, r)
+	w.WriteMsg(answer)
+
+	return 0, nil
+	// // Wrap.
+	// pw := NewResponsePrinter(w)
+
+	// // Export metric with the server label set to the current server handling the request.
+	// // requestCount.WithLabelValues(metrics.WithServer(ctx)).Inc()
+
+	// // Call next plugin (if any).
+	// return plugin.NextOrFailure(e.Name(), e.Next, ctx, pw, r)
 }
 
 // Name implements the Handler interface.
