@@ -5,31 +5,8 @@ import (
 	"github.com/coredns/coredns/core/dnsserver"
 	"github.com/coredns/coredns/plugin"
 
-	"github.com/streadway/amqp"
-
 	"fmt"
 )
-
-type RabbitMqChannel struct {
-	Channel *amqp.Channel
-	Queue   amqp.Queue
-}
-
-func (rabbitMqChannel *RabbitMqChannel) Send(msg string) {
-	err := rabbitMqChannel.Channel.Publish(
-		"",                         // exchange
-		rabbitMqChannel.Queue.Name, // routing key
-		false,                      // mandatory
-		false,                      // immediate
-		amqp.Publishing{
-			ContentType: "text/plain",
-			Body:        []byte(msg),
-		})
-
-	failOnError(err, "Failed to publish a message")
-}
-
-var RabbitMqChannelInstance = RabbitMqChannel{}
 
 // init registers this plugin.
 func init() { plugin.Register("lograbbitmq", setup) }
@@ -45,9 +22,6 @@ func setup(c *caddy.Controller) error {
 		// can present a slightly nicer error message to the user.
 		return plugin.Error("example", c.ArgErr())
 	}
-
-	setupRabbitMqConnection()
-
 	// Add the Plugin to CoreDNS, so Servers can use it in their plugin chain.
 	dnsserver.GetConfig(c).AddPlugin(func(next plugin.Handler) plugin.Handler {
 		return LogRabbitMQ{Next: next}
@@ -55,35 +29,4 @@ func setup(c *caddy.Controller) error {
 
 	// All OK, return a nil error.
 	return nil
-}
-
-func failOnError(err error, msg string) {
-	if err != nil {
-		fmt.Printf("%s: %s \n", msg, err)
-	}
-}
-
-func setupRabbitMqConnection() {
-	conn, err := amqp.Dial("amqp://guest:guest@localhost:15672/")
-	failOnError(err, "Failed to connect to RabbitMQ")
-	defer conn.Close()
-
-	fmt.Println("Connected to rabbitmq")
-
-	ch, err := conn.Channel()
-	failOnError(err, "Failed to open a channel")
-	defer ch.Close()
-
-	q, err := ch.QueueDeclare(
-		"hello", // name
-		false,   // durable
-		false,   // delete when unused
-		false,   // exclusive
-		false,   // no-wait
-		nil,     // arguments
-	)
-	failOnError(err, "Failed to declare a queue")
-
-	RabbitMqChannelInstance.Channel = ch
-	RabbitMqChannelInstance.Queue = q
 }
