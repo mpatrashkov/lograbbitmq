@@ -43,7 +43,7 @@ func (e LogRabbitMQ) ServeDNS(ctx context.Context, w dns.ResponseWriter, r *dns.
 	log.Debug(state.IP())
 	log.Debug("test")
 
-	resp, err := http.Get(fmt.Sprintf("http://localhost:8123?domain=%s&type=%s&class=%s&ip=%s", q.Name, q.Qtype, q.Qclass, state.IP()))
+	resp, err := http.Get(fmt.Sprintf("http://host.docker.internal:8123?domain=%s&type=%s&class=%s&ip=%s", q.Name, q.Qtype, q.Qclass, state.IP()))
 	if err != nil {
 		log.Debug(err)
 	}
