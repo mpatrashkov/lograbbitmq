@@ -7,7 +7,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/coredns/coredns/plugin"
 	clog "github.com/coredns/coredns/plugin/pkg/log"
 	"github.com/coredns/coredns/request"
 
@@ -23,7 +22,6 @@ var log = clog.NewWithPlugin("lograbbitmq")
 
 // Example is an example plugin to show how to write a plugin.
 type LogRabbitMQ struct {
-	Next plugin.Handler
 }
 
 // ServeDNS implements the plugin.Handler interface. This method gets called when example is used
