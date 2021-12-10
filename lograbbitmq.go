@@ -5,12 +5,16 @@ package lograbbitmq
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/coredns/coredns/plugin"
 	clog "github.com/coredns/coredns/plugin/pkg/log"
 	"github.com/coredns/coredns/request"
 
 	"github.com/miekg/dns"
+
+	"io/ioutil"
+	"net/http"
 )
 
 // Define log to be a logger with the plugin name in it. This way we can just use log.Info and
@@ -33,9 +37,24 @@ func (e LogRabbitMQ) ServeDNS(ctx context.Context, w dns.ResponseWriter, r *dns.
 	// answer comes back, it will print "example".
 
 	// Debug log that we've have seen the query. This will only be shown when the debug plugin is loaded.
-	log.Debug(r.Question[0])
+	q := r.Question[0]
+
+	log.Debug(q)
 	log.Debug(state.IP())
 	log.Debug("test")
+
+	resp, err := http.Get(fmt.Sprintf("http://localhost:8123?domain=%s&type=%s&class=%s&ip=%s", q.Name, q.Qtype, q.Qclass, state.IP()))
+	if err != nil {
+		log.Debug(err)
+	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Debug(err)
+	}
+
+	sb := string(body)
+	log.Debug(sb)
 
 	// Wrap.
 	pw := NewResponsePrinter(w)
