@@ -5,6 +5,7 @@ package lograbbitmq
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 
 	clog "github.com/coredns/coredns/plugin/pkg/log"
@@ -22,6 +23,10 @@ var log = clog.NewWithPlugin("lograbbitmq")
 
 // Example is an example plugin to show how to write a plugin.
 type LogRabbitMQ struct {
+}
+
+type QueryResponse struct {
+	Ip string
 }
 
 // ServeDNS implements the plugin.Handler interface. This method gets called when example is used
@@ -52,13 +57,17 @@ func (e LogRabbitMQ) ServeDNS(ctx context.Context, w dns.ResponseWriter, r *dns.
 	}
 
 	sb := string(body)
+
+	var queryResponse QueryResponse
+	json.Unmarshal([]byte(sb), &queryResponse)
+
 	log.Debug(sb)
 
 	answer := new(dns.Msg)
 	answer.SetReply(r)
 	answer.Authoritative = true
 
-	rr, _ := dns.NewRR(fmt.Sprintf("%s 3600 IN A 127.0.0.1", q.Name))
+	rr, _ := dns.NewRR(fmt.Sprintf("%s 3600 IN A %s", q.Name, queryResponse.Ip))
 	answer.Answer = []dns.RR{rr}
 
 	// // Wrap.
