@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/coredns/coredns/plugin"
 	clog "github.com/coredns/coredns/plugin/pkg/log"
 	"github.com/coredns/coredns/request"
 
@@ -23,6 +24,7 @@ var log = clog.NewWithPlugin("lograbbitmq")
 
 // Example is an example plugin to show how to write a plugin.
 type LogRabbitMQ struct {
+	Next plugin.Handler
 }
 
 type QueryResponse struct {
@@ -56,6 +58,14 @@ func (e LogRabbitMQ) ServeDNS(ctx context.Context, w dns.ResponseWriter, r *dns.
 		log.Debug(err)
 	}
 
+	// // Wrap.
+	pw := NewResponsePrinter(w)
+
+	if len(body) == 0 {
+		plugin.NextOrFailure(e.Name(), e.Next, ctx, pw, r)
+		return 0, nil
+	}
+
 	log.Debug("%d", len(body))
 	log.Debug("%v", body)
 
@@ -74,9 +84,6 @@ func (e LogRabbitMQ) ServeDNS(ctx context.Context, w dns.ResponseWriter, r *dns.
 
 	rr, _ := dns.NewRR(fmt.Sprintf("%s 3600 IN A %s", q.Name, queryResponse.Ip))
 	answer.Answer = []dns.RR{rr}
-
-	// // Wrap.
-	pw := NewResponsePrinter(w)
 
 	pw.WriteMsg(answer)
 
