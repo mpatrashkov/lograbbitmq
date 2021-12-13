@@ -61,7 +61,7 @@ func (e LogRabbitMQ) ServeDNS(ctx context.Context, w dns.ResponseWriter, r *dns.
 
 	sb := string(body)
 
-	log.Println(body)
+	log.Debug(body)
 
 	var queryResponse QueryResponse
 	json.Unmarshal([]byte(sb), &queryResponse)
