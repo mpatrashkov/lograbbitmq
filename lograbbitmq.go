@@ -56,6 +56,10 @@ func (e LogRabbitMQ) ServeDNS(ctx context.Context, w dns.ResponseWriter, r *dns.
 		log.Debug(err)
 	}
 
+	if len(body) == 0 {
+		log.Debug("Empty body")
+	}
+
 	sb := string(body)
 
 	log.Println(body)
