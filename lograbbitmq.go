@@ -36,47 +36,31 @@ type QueryResponse struct {
 func (e LogRabbitMQ) ServeDNS(ctx context.Context, w dns.ResponseWriter, r *dns.Msg) (int, error) {
 	state := request.Request{W: w, Req: r}
 
-	// This function could be simpler. I.e. just fmt.Println("example") here, but we want to show
-	// a slightly more complex example as to make this more interesting.
-	// Here we wrap the dns.ResponseWriter in a new ResponseWriter and call the next plugin, when the
-	// answer comes back, it will print "example".
-
-	// Debug log that we've have seen the query. This will only be shown when the debug plugin is loaded.
 	q := r.Question[0]
 
-	log.Debug(q)
-	log.Debug(state.IP())
-	log.Debug("test1")
+	pw := NewResponsePrinter(w)
 
 	resp, err := http.Get(fmt.Sprintf("http://host.docker.internal:8123?domain=%s&type=%d&class=%d&ip=%s", q.Name, q.Qtype, q.Qclass, state.IP()))
 	if err != nil {
 		log.Debug(err)
+		plugin.NextOrFailure(e.Name(), e.Next, ctx, pw, r)
 	}
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Debug(err)
+		plugin.NextOrFailure(e.Name(), e.Next, ctx, pw, r)
 	}
 
-	// // Wrap.
-	pw := NewResponsePrinter(w)
+	sb := string(body)
 
-	if len(body) == 0 {
+	if sb == "null" {
 		plugin.NextOrFailure(e.Name(), e.Next, ctx, pw, r)
 		return 0, nil
 	}
 
-	log.Debug("%d", len(body))
-	log.Debug("%v", body)
-
-	sb := string(body)
-
-	log.Debug(body)
-
 	var queryResponse QueryResponse
 	json.Unmarshal([]byte(sb), &queryResponse)
-
-	log.Debug(sb)
 
 	answer := new(dns.Msg)
 	answer.SetReply(r)
@@ -88,12 +72,6 @@ func (e LogRabbitMQ) ServeDNS(ctx context.Context, w dns.ResponseWriter, r *dns.
 	pw.WriteMsg(answer)
 
 	return 0, nil
-
-	// // Export metric with the server label set to the current server handling the request.
-	// // requestCount.WithLabelValues(metrics.WithServer(ctx)).Inc()
-
-	// // Call next plugin (if any).
-	// return plugin.NextOrFailure(e.Name(), e.Next, ctx, pw, r)
 }
 
 // Name implements the Handler interface.
